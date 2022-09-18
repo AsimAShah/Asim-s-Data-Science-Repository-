@@ -1,0 +1,275 @@
+Feature Selection- Dropping constant features
+
+In this step we will be removing the features which have constant features which are actually not important for solving the problem statement
+
+In [9]:
+# Import pandas to create DataFrame 
+import pandas as pd 
+  
+# Make DataFrame of the given data 
+data = pd.DataFrame({"A":[1,2,4,1,2,4], 
+                    "B":[4,5,6,7,8,9], 
+                    "C":[0,0,0,0,0,0],
+                    "D":[1,1,1,1,1,1]}) 
+In [10]:
+data.head()
+Out[10]:
+A	B	C	D
+0	1	4	0	1
+1	2	5	0	1
+2	4	6	0	1
+3	1	7	0	1
+4	2	8	0	1
+Variance Threshold
+
+Feature selector that removes all low-variance features.
+
+This feature selection algorithm looks only at the features (X), not the desired outputs (y), and can thus be used for unsupervised learning.
+
+In [11]:
+### It will zero variance features
+from sklearn.feature_selection import VarianceThreshold
+var_thres=VarianceThreshold(threshold=0)
+var_thres.fit(data)
+Out[11]:
+VarianceThreshold(threshold=0)
+In [12]:
+var_thres.get_support()
+Out[12]:
+array([ True,  True, False, False])
+In [13]:
+data.columns[var_thres.get_support()]
+Out[13]:
+Index(['A', 'B'], dtype='object')
+In [14]:
+constant_columns = [column for column in data.columns
+                    if column not in data.columns[var_thres.get_support()]]
+
+print(len(constant_columns))
+2
+In [15]:
+for feature in constant_columns:
+     print(feature)
+C
+D
+In [16]:
+data.drop(constant_columns,axis=1)
+Out[16]:
+A	B
+0	1	4
+1	2	5
+2	4	6
+3	1	7
+4	2	8
+5	4	9
+Lets practise on bigger dataset
+
+https://www.kaggle.com/c/santander-customer-satisfaction/data?select=train.csv
+
+In [74]:
+import pandas as pd
+from sklearn.feature_selection import VarianceThreshold
+In [17]:
+df=pd.read_csv('santander.csv',nrows=10000)
+In [18]:
+df.shape
+Out[18]:
+(10000, 371)
+In [19]:
+df.head()
+Out[19]:
+ID	var3	var15	imp_ent_var16_ult1	imp_op_var39_comer_ult1	imp_op_var39_comer_ult3	imp_op_var40_comer_ult1	imp_op_var40_comer_ult3	imp_op_var40_efect_ult1	imp_op_var40_efect_ult3	...	saldo_medio_var33_hace2	saldo_medio_var33_hace3	saldo_medio_var33_ult1	saldo_medio_var33_ult3	saldo_medio_var44_hace2	saldo_medio_var44_hace3	saldo_medio_var44_ult1	saldo_medio_var44_ult3	var38	TARGET
+0	1	2	23	0.0	0.0	0.0	0.0	0.0	0	0	...	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	39205.170000	0
+1	3	2	34	0.0	0.0	0.0	0.0	0.0	0	0	...	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	49278.030000	0
+2	4	2	23	0.0	0.0	0.0	0.0	0.0	0	0	...	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	67333.770000	0
+3	8	2	37	0.0	195.0	195.0	0.0	0.0	0	0	...	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	64007.970000	0
+4	10	2	39	0.0	0.0	0.0	0.0	0.0	0	0	...	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	117310.979016	0
+5 rows × 371 columns
+
+In [20]:
+X=df.drop(labels=['TARGET'], axis=1)
+y=df['TARGET']
+In [21]:
+from sklearn.model_selection import train_test_split
+# separate dataset into train and test
+X_train, X_test, y_train, y_test = train_test_split(
+    df.drop(labels=['TARGET'], axis=1),
+    df['TARGET'],
+    test_size=0.3,
+    random_state=0)
+
+X_train.shape, X_test.shape
+Out[21]:
+((7000, 370), (3000, 370))
+Lets apply the variance threshold
+In [22]:
+var_thres=VarianceThreshold(threshold=0)
+var_thres.fit(X_train)
+Out[22]:
+VarianceThreshold(threshold=0)
+In [24]:
+var_thres.get_support()
+Out[24]:
+array([ True,  True,  True,  True,  True,  True,  True,  True,  True,
+        True,  True,  True,  True,  True,  True,  True,  True,  True,
+        True,  True,  True,  True, False, False,  True,  True,  True,
+        True,  True,  True,  True,  True,  True,  True,  True,  True,
+        True, False, False,  True,  True,  True,  True,  True, False,
+       False,  True,  True,  True,  True,  True,  True,  True,  True,
+        True,  True,  True, False, False, False, False,  True,  True,
+        True,  True,  True,  True,  True,  True,  True,  True,  True,
+       False, False,  True,  True,  True,  True,  True,  True,  True,
+       False,  True,  True,  True, False, False,  True,  True,  True,
+        True,  True,  True,  True,  True,  True,  True,  True,  True,
+        True,  True,  True,  True, False, False,  True,  True,  True,
+        True,  True, False, False,  True,  True,  True,  True,  True,
+        True,  True,  True,  True,  True,  True,  True,  True,  True,
+        True,  True,  True,  True,  True,  True, False, False, False,
+       False,  True,  True,  True,  True,  True,  True,  True,  True,
+        True,  True, False, False,  True,  True,  True,  True,  True,
+        True,  True,  True, False,  True,  True,  True,  True,  True,
+       False, False,  True,  True,  True,  True,  True,  True,  True,
+       False,  True,  True,  True, False,  True,  True,  True,  True,
+       False, False,  True,  True,  True,  True,  True, False,  True,
+        True, False,  True,  True, False,  True, False, False,  True,
+        True,  True,  True,  True, False, False,  True, False,  True,
+       False,  True,  True,  True,  True,  True,  True, False, False,
+        True, False,  True, False,  True, False, False, False, False,
+        True,  True,  True,  True,  True,  True, False,  True,  True,
+        True, False,  True, False, False, False, False,  True,  True,
+       False,  True, False, False, False,  True, False, False, False,
+        True, False,  True,  True,  True,  True,  True,  True,  True,
+        True, False, False,  True,  True,  True,  True,  True,  True,
+       False,  True,  True,  True,  True,  True,  True,  True,  True,
+        True,  True,  True,  True,  True,  True,  True, False,  True,
+        True,  True,  True,  True,  True,  True,  True,  True,  True,
+        True,  True,  True,  True,  True,  True,  True, False,  True,
+       False, False, False, False,  True,  True,  True,  True, False,
+        True, False, False, False,  True, False, False, False,  True,
+        True,  True,  True,  True, False,  True,  True,  True,  True,
+        True,  True,  True,  True,  True,  True,  True,  True,  True,
+        True,  True,  True,  True,  True,  True,  True, False, False,
+       False, False,  True,  True,  True,  True, False, False,  True,
+        True,  True,  True,  True,  True,  True,  True,  True,  True,
+        True])
+In [23]:
+### Finding non constant features
+sum(var_thres.get_support())
+Out[23]:
+284
+In [86]:
+# Lets Find non-constant features 
+len(X_train.columns[var_thres.get_support()])
+Out[86]:
+204
+In [25]:
+constant_columns = [column for column in X_train.columns
+                    if column not in X_train.columns[var_thres.get_support()]]
+
+print(len(constant_columns))
+86
+In [26]:
+for column in constant_columns:
+    print(column)
+ind_var2_0
+ind_var2
+ind_var13_medio_0
+ind_var13_medio
+ind_var18_0
+ind_var18
+ind_var27_0
+ind_var28_0
+ind_var28
+ind_var27
+ind_var34_0
+ind_var34
+ind_var41
+ind_var46_0
+ind_var46
+num_var13_medio_0
+num_var13_medio
+num_var18_0
+num_var18
+num_var27_0
+num_var28_0
+num_var28
+num_var27
+num_var34_0
+num_var34
+num_var41
+num_var46_0
+num_var46
+saldo_var13_medio
+saldo_var18
+saldo_var28
+saldo_var27
+saldo_var34
+saldo_var41
+saldo_var46
+delta_imp_amort_var18_1y3
+delta_imp_amort_var34_1y3
+delta_imp_reemb_var17_1y3
+delta_imp_reemb_var33_1y3
+delta_imp_trasp_var17_out_1y3
+delta_imp_trasp_var33_out_1y3
+delta_num_reemb_var17_1y3
+delta_num_reemb_var33_1y3
+delta_num_trasp_var17_out_1y3
+delta_num_trasp_var33_out_1y3
+imp_amort_var18_hace3
+imp_amort_var18_ult1
+imp_amort_var34_hace3
+imp_amort_var34_ult1
+imp_var7_emit_ult1
+imp_reemb_var13_hace3
+imp_reemb_var17_hace3
+imp_reemb_var17_ult1
+imp_reemb_var33_hace3
+imp_reemb_var33_ult1
+imp_trasp_var17_in_hace3
+imp_trasp_var17_out_hace3
+imp_trasp_var17_out_ult1
+imp_trasp_var33_in_hace3
+imp_trasp_var33_out_hace3
+imp_trasp_var33_out_ult1
+imp_venta_var44_hace3
+ind_var7_emit_ult1
+num_var2_0_ult1
+num_var2_ult1
+num_var7_emit_ult1
+num_meses_var13_medio_ult3
+num_reemb_var13_hace3
+num_reemb_var17_hace3
+num_reemb_var17_ult1
+num_reemb_var33_hace3
+num_reemb_var33_ult1
+num_trasp_var17_in_hace3
+num_trasp_var17_out_hace3
+num_trasp_var17_out_ult1
+num_trasp_var33_in_hace3
+num_trasp_var33_out_hace3
+num_trasp_var33_out_ult1
+num_venta_var44_hace3
+saldo_var2_ult1
+saldo_medio_var13_medio_hace2
+saldo_medio_var13_medio_hace3
+saldo_medio_var13_medio_ult1
+saldo_medio_var13_medio_ult3
+saldo_medio_var29_hace2
+saldo_medio_var29_hace3
+In [27]:
+X_train.drop(constant_columns,axis=1)
+Out[27]:
+ID	var3	var15	imp_ent_var16_ult1	imp_op_var39_comer_ult1	imp_op_var39_comer_ult3	imp_op_var40_comer_ult1	imp_op_var40_comer_ult3	imp_op_var40_efect_ult1	imp_op_var40_efect_ult3	...	saldo_medio_var29_ult3	saldo_medio_var33_hace2	saldo_medio_var33_hace3	saldo_medio_var33_ult1	saldo_medio_var33_ult3	saldo_medio_var44_hace2	saldo_medio_var44_hace3	saldo_medio_var44_ult1	saldo_medio_var44_ult3	var38
+7681	15431	2	42	840.0	4477.02	4989.54	0.0	0.0	0	0	...	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	37491.21
+9031	18181	2	31	0.0	52.32	52.32	0.0	0.0	0	0	...	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	106685.94
+3691	7411	2	51	0.0	0.00	0.00	0.0	0.0	0	0	...	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	66144.66
+202	407	2	36	0.0	0.00	0.00	0.0	0.0	0	0	...	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	92121.36
+5625	11280	2	23	0.0	0.00	0.00	0.0	0.0	0	0	...	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	74650.83
+...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...
+9225	18564	2	33	0.0	0.00	0.00	0.0	0.0	0	0	...	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	117547.89
+4859	9723	2	24	0.0	0.00	0.00	0.0	0.0	0	0	...	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	71050.83
+3264	6557	2	24	0.0	0.00	0.00	0.0	0.0	0	0	...	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	141069.33
+9845	19796	2	38	0.0	0.00	0.00	0.0	0.0	0	0	...	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	86412.15
+2732	5441	2	23	0.0	0.00	0.00	0.0	0.0	0	0	...	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	0.0	45985.68
+7000 rows × 284 columns
