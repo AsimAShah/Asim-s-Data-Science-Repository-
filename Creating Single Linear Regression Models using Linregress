@@ -1,0 +1,13 @@
+import pandas as pd # Import the necessary modules
+import scipy.stats as st
+house = pd.read_csv('kc_house_data.csv')  # Code to read in kc_house_data.csv
+corr_mat = (house[["price", "bedrooms", "sqft_living"]].corr()) # Display the correlation matrix for the columns price, bedrooms, and sqft_living, in that order
+
+print(corr_mat)
+
+y = house.price
+x = house.sqft_living # Perform simple linear regression on price and the column with the highest correlation
+model = st.linregress(x,y) # Code to perform SLR using linregress
+
+# Print the summary
+print(model)
