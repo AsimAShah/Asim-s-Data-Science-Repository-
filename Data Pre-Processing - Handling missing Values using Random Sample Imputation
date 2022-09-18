@@ -1,0 +1,194 @@
+import pandas as pd
+df=pd.read_csv('titanic.csv', usecols=['Age','Fare','Survived'])
+df.head()
+Out[1]:
+Survived	Age	Fare
+0	0	22.0	7.2500
+1	1	38.0	71.2833
+2	1	26.0	7.9250
+3	1	35.0	53.1000
+4	0	35.0	8.0500
+In [2]:
+df.isnull().sum()
+Out[2]:
+Survived      0
+Age         177
+Fare          0
+dtype: int64
+In [4]:
+df.isnull().mean()
+Out[4]:
+Survived    0.000000
+Age         0.198653
+Fare        0.000000
+dtype: float64
+In [14]:
+df['Age'].isnull().sum()
+Out[14]:
+177
+In [22]:
+df['Age'].dropna().sample(df['Age'].isnull().sum(),random_state=0)
+Out[22]:
+423    28.00
+177    50.00
+305     0.92
+292    36.00
+889    26.00
+595    36.00
+637    31.00
+54     65.00
+456    65.00
+110    47.00
+287    22.00
+315    26.00
+691     4.00
+811    39.00
+861    21.00
+15     55.00
+239    33.00
+644     0.75
+394    24.00
+795    39.00
+131    20.00
+346    40.00
+9      14.00
+477    29.00
+606    30.00
+469     0.75
+325    36.00
+72     21.00
+724    27.00
+40     40.00
+       ...  
+396    31.00
+452    30.00
+395    22.00
+882    22.00
+821    27.00
+314    43.00
+622    20.00
+204    18.00
+60     22.00
+731    11.00
+81     29.00
+676    24.50
+433    17.00
+378    20.00
+174    56.00
+624    21.00
+642     2.00
+157    30.00
+427    19.00
+698    49.00
+179    36.00
+24      8.00
+630    80.00
+458    50.00
+49     18.00
+539    22.00
+267    25.00
+352    15.00
+99     34.00
+689    15.00
+Name: Age, Length: 177, dtype: float64
+In [23]:
+df[df['Age'].isnull()].index
+Out[23]:
+Int64Index([  5,  17,  19,  26,  28,  29,  31,  32,  36,  42,
+            ...
+            832, 837, 839, 846, 849, 859, 863, 868, 878, 888],
+           dtype='int64', length=177)
+In [24]:
+def impute_nan(df,variable,median):
+    df[variable+"_median"]=df[variable].fillna(median)
+    df[variable+"_random"]=df[variable]
+    ##It will have the random sample to fill the na
+    random_sample=df[variable].dropna().sample(df[variable].isnull().sum(),random_state=0)
+    ##pandas need to have same index in order to merge the dataset
+    random_sample.index=df[df[variable].isnull()].index
+    df.loc[df[variable].isnull(),variable+'_random']=random_sample
+In [25]:
+median=df.Age.median()
+In [26]:
+median
+Out[26]:
+28.0
+In [27]:
+impute_nan(df,"Age",median)
+In [28]:
+df.head()
+Out[28]:
+Survived	Age	Fare	Age_median	Age_random
+0	0	22.0	7.2500	22.0	22.0
+1	1	38.0	71.2833	38.0	38.0
+2	1	26.0	7.9250	26.0	26.0
+3	1	35.0	53.1000	35.0	35.0
+4	0	35.0	8.0500	35.0	35.0
+In [29]:
+import matplotlib.pyplot as plt
+%matplotlib inline
+In [33]:
+fig = plt.figure()
+ax = fig.add_subplot(111)
+df['Age'].plot(kind='kde', ax=ax)
+df.Age_median.plot(kind='kde', ax=ax, color='red')
+df.Age_random.plot(kind='kde', ax=ax, color='green')
+lines, labels = ax.get_legend_handles_labels()
+ax.legend(lines, labels, loc='best')
+Out[33]:
+<matplotlib.legend.Legend at 0x2861b07e438>
+
+Advantages
+
+Easy To implement
+There is less distortion in variance
+Disadvantage
+
+Every situation randomness wont work
+Capturing NAN values with a new feature
+
+It works well if the data are not missing completely at random
+
+In [35]:
+df=pd.read_csv('titanic.csv', usecols=['Age','Fare','Survived'])
+df.head()
+Out[35]:
+Survived	Age	Fare
+0	0	22.0	7.2500
+1	1	38.0	71.2833
+2	1	26.0	7.9250
+3	1	35.0	53.1000
+4	0	35.0	8.0500
+In [38]:
+import numpy as np
+df['Age_NAN']=np.where(df['Age'].isnull(),1,0)
+In [39]:
+df.head()
+Out[39]:
+Survived	Age	Fare	Age_NAN
+0	0	22.0	7.2500	0
+1	1	38.0	71.2833	0
+2	1	26.0	7.9250	0
+3	1	35.0	53.1000	0
+4	0	35.0	8.0500	0
+In [41]:
+df.Age.median()
+Out[41]:
+28.0
+In [44]:
+df['Age'].fillna(df.Age.median(),inplace=True)
+In [46]:
+df.head(10)
+Out[46]:
+Survived	Age	Fare	Age_NAN
+0	0	22.0	7.2500	0
+1	1	38.0	71.2833	0
+2	1	26.0	7.9250	0
+3	1	35.0	53.1000	0
+4	0	35.0	8.0500	0
+5	0	28.0	8.4583	1
+6	0	54.0	51.8625	0
+7	0	2.0	21.0750	0
+8	1	27.0	11.1333	0
+9	1	14.0	30.0708	0
+
