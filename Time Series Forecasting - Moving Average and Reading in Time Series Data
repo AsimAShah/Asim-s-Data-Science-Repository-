@@ -1,0 +1,21 @@
+import pandas as pd # load the pandas and datetime modules
+from datetime import datetime 
+
+dateparse = lambda dates: datetime.strptime(dates, '%Y/%m/%d')  # lambda function that converts a string into datetime
+
+births = pd.read_csv('births.csv', parse_dates=['Date'], date_parser=dateparse) # load the births dataset as a time series
+
+print (births.head()) # print the first 5 lines of the dataset
+
+# moving Average 
+
+import pandas as pd
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+
+ts = pd.read_csv('Heating.csv') # load the Heating.csv dataset 
+
+expense = pd.Series(ts.Expense) # load the Expense column as a pandas Series
+
+mov_ave = expense.rolling(window=4, center=False).mean() # create the 4-MA series
+
+print(mov_ave)
