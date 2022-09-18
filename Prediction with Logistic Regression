@@ -1,0 +1,30 @@
+# import the necessary modules
+import pandas as pd
+import numpy as np 
+import statsmodels.api as sm 
+from statsmodels.tools import add_constant 
+
+female = int(input())
+age = float(input())
+economy = int(input())
+delay = float(input())
+
+flights = pd.read_csv('Invistico_Airline_LR.csv') # read in the file Invistico_Airline_LR.csv
+
+# remove missing data
+flights.dropna(axis = 0, inplace = True)
+
+
+flights = pd.get_dummies(data=flights, columns=['Gender', 'Class', 'satisfaction'])  # recode the categorical variables Gender, Class, and satisfaction as dummy variables
+
+X = flights[['Gender_Female', 'Age', 'Class_Eco', 'Arrival_Delay_in_Minutes']] # create a new data frame from the variables Gender_Female, Age, Class_Eco, and Arrival_Delay_in_Minutes, in that order.
+
+X = add_constant(X)
+Y = flights['satisfaction_satisfied'] # set Y as the response variable satisfaction_satisfied
+
+model = sm.GLM(Y,X,family=sm.families.Binomial()).fit() # perform logistic regression on X and Y
+
+ex = np.array([1, female, age, economy, delay]) # create an array with 1 for the intercept, and the user input values female, age, economy, and delay
+
+prediction = model.predict(ex) # find the predicted probablility that a customer with the user input values is satisfied
+print(prediction)
