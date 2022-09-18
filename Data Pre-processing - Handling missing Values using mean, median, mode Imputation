@@ -1,0 +1,128 @@
+import pandas as pd
+In [2]:
+df=pd.read_csv('titanic.csv')
+In [3]:
+df.head()
+Out[3]:
+PassengerId	Survived	Pclass	Name	Sex	Age	SibSp	Parch	Ticket	Fare	Cabin	Embarked
+0	1	0	3	Braund, Mr. Owen Harris	male	22.0	1	0	A/5 21171	7.2500	NaN	S
+1	2	1	1	Cumings, Mrs. John Bradley (Florence Briggs Th...	female	38.0	1	0	PC 17599	71.2833	C85	C
+2	3	1	3	Heikkinen, Miss. Laina	female	26.0	0	0	STON/O2. 3101282	7.9250	NaN	S
+3	4	1	1	Futrelle, Mrs. Jacques Heath (Lily May Peel)	female	35.0	1	0	113803	53.1000	C123	S
+4	5	0	3	Allen, Mr. William Henry	male	35.0	0	0	373450	8.0500	NaN	S
+In [4]:
+df.isnull().sum()
+Out[4]:
+PassengerId      0
+Survived         0
+Pclass           0
+Name             0
+Sex              0
+Age            177
+SibSp            0
+Parch            0
+Ticket           0
+Fare             0
+Cabin          687
+Embarked         2
+dtype: int64
+In [7]:
+df[df['Embarked'].isnull()]
+Out[7]:
+PassengerId	Survived	Pclass	Name	Sex	Age	SibSp	Parch	Ticket	Fare	Cabin	Embarked
+61	62	1	1	Icard, Miss. Amelie	female	38.0	0	0	113572	80.0	B28	NaN
+829	830	1	1	Stone, Mrs. George Nelson (Martha Evelyn)	female	62.0	0	0	113572	80.0	B28	NaN
+##### Missing Data Not At Random(MNAR): Systematic missing Values There is absolutely some relationship between the data missing and any other values, observed or missing, within the dataset.
+In [8]:
+import numpy as np
+df['cabin_null']=np.where(df['Cabin'].isnull(),1,0)
+
+##find the percentage of null values
+df['cabin_null'].mean()
+Out[8]:
+0.7710437710437711
+In [ ]:
+ 
+In [9]:
+df.columns
+Out[9]:
+Index(['PassengerId', 'Survived', 'Pclass', 'Name', 'Sex', 'Age', 'SibSp',
+       'Parch', 'Ticket', 'Fare', 'Cabin', 'Embarked', 'cabin_null'],
+      dtype='object')
+In [13]:
+df.groupby(['Survived'])['cabin_null'].mean()
+Out[13]:
+Survived
+0    0.876138
+1    0.602339
+Name: cabin_null, dtype: float64
+Missing At Random(MAR)
+In [ ]:
+Men---hide their salary
+Women---hide their age
+In [ ]:
+### All the techniques of handling ,issing values
+
+1. Mean/ Median/Mode replacement
+2. Random Sample Imputation
+3. Capturing NAN values with a new feature
+4. End of Distribution imputation
+5. Arbitrary imputation
+6. Frequent categories imputation
+Mean/ MEdian /Mode imputation
+
+When should we apply? Mean/median imputation has the assumption that the data are missing completely at random(MCAR). We solve this by replacing the NAN with the most frequent occurance of the variables
+
+In [15]:
+df=pd.read_csv('titanic.csv',usecols=['Age','Fare','Survived'])
+df.head()
+Out[15]:
+Survived	Age	Fare
+0	0	22.0	7.2500
+1	1	38.0	71.2833
+2	1	26.0	7.9250
+3	1	35.0	53.1000
+4	0	35.0	8.0500
+In [17]:
+## Lets go and see the percentage of missing values
+df.isnull().mean()
+Out[17]:
+Survived    0.000000
+Age         0.198653
+Fare        0.000000
+dtype: float64
+In [18]:
+def impute_nan(df,variable,median):
+    df[variable+"_median"]=df[variable].fillna(median)
+In [20]:
+median=df.Age.median()
+median
+Out[20]:
+28.0
+In [21]:
+impute_nan(df,'Age',median)
+df.head()
+Out[21]:
+Survived	Age	Fare	Age_median
+0	0	22.0	7.2500	22.0
+1	1	38.0	71.2833	38.0
+2	1	26.0	7.9250	26.0
+3	1	35.0	53.1000	35.0
+4	0	35.0	8.0500	35.0
+In [22]:
+print(df['Age'].std())
+print(df['Age_median'].std())
+14.526497332334042
+13.019696550973201
+In [23]:
+import matplotlib.pyplot as plt
+%matplotlib inline
+In [25]:
+fig = plt.figure()
+ax = fig.add_subplot(111)
+df['Age'].plot(kind='kde', ax=ax)
+df.Age_median.plot(kind='kde', ax=ax, color='red')
+lines, labels = ax.get_legend_handles_labels()
+ax.legend(lines, labels, loc='best')
+Out[25]:
+<matplotlib.legend.Legend at 0x273541c2828>
