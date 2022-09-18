@@ -1,0 +1,41 @@
+df=pd.read_csv('titanic.csv', usecols=['Age','Fare','Survived'])
+df.head()
+Out[35]:
+Survived	Age	Fare
+0	0	22.0	7.2500
+1	1	38.0	71.2833
+2	1	26.0	7.9250
+3	1	35.0	53.1000
+4	0	35.0	8.0500
+In [38]:
+import numpy as np
+df['Age_NAN']=np.where(df['Age'].isnull(),1,0)
+In [39]:
+df.head()
+Out[39]:
+Survived	Age	Fare	Age_NAN
+0	0	22.0	7.2500	0
+1	1	38.0	71.2833	0
+2	1	26.0	7.9250	0
+3	1	35.0	53.1000	0
+4	0	35.0	8.0500	0
+In [41]:
+df.Age.median()
+Out[41]:
+28.0
+In [44]:
+df['Age'].fillna(df.Age.median(),inplace=True)
+In [46]:
+df.head(10)
+Out[46]:
+Survived	Age	Fare	Age_NAN
+0	0	22.0	7.2500	0
+1	1	38.0	71.2833	0
+2	1	26.0	7.9250	0
+3	1	35.0	53.1000	0
+4	0	35.0	8.0500	0
+5	0	28.0	8.4583	1
+6	0	54.0	51.8625	0
+7	0	2.0	21.0750	0
+8	1	27.0	11.1333	0
+9	1	14.0	30.0708	0
