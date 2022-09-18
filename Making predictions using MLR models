@@ -1,0 +1,16 @@
+import pandas as pd 
+import statsmodels.formula.api as sms 
+import numpy as np # load the necessary modules
+
+wine = pd.read_csv('wine.csv') # load wine.csv
+
+model = sms.ols('quality ~ chlorides + pH + alcohol', data = wine).fit() # fit a multiple regression model using the sms.ols function
+
+chlorides = float(input())
+pH = float(input())
+alcohol = float(input())
+
+prediction = model.predict(exog = dict(chlorides = chlorides, pH = pH, alcohol = alcohol ))   # use the model.predict function to find the predicted value for quality using 
+             # the input values for chlorides, pH, and alcohol
+
+print(prediction)
