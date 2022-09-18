@@ -1,0 +1,335 @@
+2. Feature Selection- With Correlation
+
+In this step we will be removing the features which are highly correlated
+
+In [77]:
+#importing libraries
+from sklearn.datasets import load_boston
+import pandas as pd
+import matplotlib.pyplot as plt
+%matplotlib inline
+In [78]:
+#Loading the dataset
+data = load_boston()
+df = pd.DataFrame(data.data, columns = data.feature_names)
+df["MEDV"] = data.target
+In [79]:
+data.feature_names
+Out[79]:
+array(['CRIM', 'ZN', 'INDUS', 'CHAS', 'NOX', 'RM', 'AGE', 'DIS', 'RAD',
+       'TAX', 'PTRATIO', 'B', 'LSTAT'], dtype='<U7')
+In [80]:
+df.head()
+Out[80]:
+CRIM	ZN	INDUS	CHAS	NOX	RM	AGE	DIS	RAD	TAX	PTRATIO	B	LSTAT	MEDV
+0	0.00632	18.0	2.31	0.0	0.538	6.575	65.2	4.0900	1.0	296.0	15.3	396.90	4.98	24.0
+1	0.02731	0.0	7.07	0.0	0.469	6.421	78.9	4.9671	2.0	242.0	17.8	396.90	9.14	21.6
+2	0.02729	0.0	7.07	0.0	0.469	7.185	61.1	4.9671	2.0	242.0	17.8	392.83	4.03	34.7
+3	0.03237	0.0	2.18	0.0	0.458	6.998	45.8	6.0622	3.0	222.0	18.7	394.63	2.94	33.4
+4	0.06905	0.0	2.18	0.0	0.458	7.147	54.2	6.0622	3.0	222.0	18.7	396.90	5.33	36.2
+In [14]:
+data.feature_names
+Out[14]:
+array(['CRIM', 'ZN', 'INDUS', 'CHAS', 'NOX', 'RM', 'AGE', 'DIS', 'RAD',
+       'TAX', 'PTRATIO', 'B', 'LSTAT'], dtype='<U7')
+In [81]:
+X = df.drop("MEDV",axis=1)   #Feature Matrix
+y = df["MEDV"] 
+In [82]:
+df.head()
+Out[82]:
+CRIM	ZN	INDUS	CHAS	NOX	RM	AGE	DIS	RAD	TAX	PTRATIO	B	LSTAT	MEDV
+0	0.00632	18.0	2.31	0.0	0.538	6.575	65.2	4.0900	1.0	296.0	15.3	396.90	4.98	24.0
+1	0.02731	0.0	7.07	0.0	0.469	6.421	78.9	4.9671	2.0	242.0	17.8	396.90	9.14	21.6
+2	0.02729	0.0	7.07	0.0	0.469	7.185	61.1	4.9671	2.0	242.0	17.8	392.83	4.03	34.7
+3	0.03237	0.0	2.18	0.0	0.458	6.998	45.8	6.0622	3.0	222.0	18.7	394.63	2.94	33.4
+4	0.06905	0.0	2.18	0.0	0.458	7.147	54.2	6.0622	3.0	222.0	18.7	396.90	5.33	36.2
+In [83]:
+X.head()
+Out[83]:
+CRIM	ZN	INDUS	CHAS	NOX	RM	AGE	DIS	RAD	TAX	PTRATIO	B	LSTAT
+0	0.00632	18.0	2.31	0.0	0.538	6.575	65.2	4.0900	1.0	296.0	15.3	396.90	4.98
+1	0.02731	0.0	7.07	0.0	0.469	6.421	78.9	4.9671	2.0	242.0	17.8	396.90	9.14
+2	0.02729	0.0	7.07	0.0	0.469	7.185	61.1	4.9671	2.0	242.0	17.8	392.83	4.03
+3	0.03237	0.0	2.18	0.0	0.458	6.998	45.8	6.0622	3.0	222.0	18.7	394.63	2.94
+4	0.06905	0.0	2.18	0.0	0.458	7.147	54.2	6.0622	3.0	222.0	18.7	396.90	5.33
+In [84]:
+# separate dataset into train and test
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.3,
+    random_state=0)
+
+X_train.shape, X_test.shape
+Out[84]:
+((354, 13), (152, 13))
+In [85]:
+X_train.corr()
+Out[85]:
+CRIM	ZN	INDUS	CHAS	NOX	RM	AGE	DIS	RAD	TAX	PTRATIO	B	LSTAT
+CRIM	1.000000	-0.196172	0.382073	-0.049364	0.416560	-0.188280	0.329927	-0.355840	0.603880	0.560570	0.264780	-0.299525	0.439369
+ZN	-0.196172	1.000000	-0.529392	-0.063863	-0.523572	0.319260	-0.583885	0.658331	-0.314833	-0.327834	-0.392838	0.164641	-0.429178
+INDUS	0.382073	-0.529392	1.000000	0.044224	0.750218	-0.392969	0.629257	-0.686848	0.578459	0.719038	0.388353	-0.331638	0.603374
+CHAS	-0.049364	-0.063863	0.044224	1.000000	0.043748	0.088125	0.067269	-0.085492	0.022338	-0.017156	-0.072683	0.069682	-0.059060
+NOX	0.416560	-0.523572	0.750218	0.043748	1.000000	-0.279202	0.740052	-0.765753	0.627188	0.683445	0.179046	-0.369445	0.577154
+RM	-0.188280	0.319260	-0.392969	0.088125	-0.279202	1.000000	-0.235839	0.183857	-0.179242	-0.275242	-0.385526	0.157459	-0.623920
+AGE	0.329927	-0.583885	0.629257	0.067269	0.740052	-0.235839	1.000000	-0.761543	0.440578	0.502429	0.239729	-0.250416	0.606530
+DIS	-0.355840	0.658331	-0.686848	-0.085492	-0.765753	0.183857	-0.761543	1.000000	-0.467653	-0.519643	-0.176620	0.248376	-0.501780
+RAD	0.603880	-0.314833	0.578459	0.022338	0.627188	-0.179242	0.440578	-0.467653	1.000000	0.907455	0.437687	-0.415325	0.442783
+TAX	0.560570	-0.327834	0.719038	-0.017156	0.683445	-0.275242	0.502429	-0.519643	0.907455	1.000000	0.447518	-0.412145	0.515905
+PTRATIO	0.264780	-0.392838	0.388353	-0.072683	0.179046	-0.385526	0.239729	-0.176620	0.437687	0.447518	1.000000	-0.145638	0.387752
+B	-0.299525	0.164641	-0.331638	0.069682	-0.369445	0.157459	-0.250416	0.248376	-0.415325	-0.412145	-0.145638	1.000000	-0.365338
+LSTAT	0.439369	-0.429178	0.603374	-0.059060	0.577154	-0.623920	0.606530	-0.501780	0.442783	0.515905	0.387752	-0.365338	1.000000
+In [86]:
+import seaborn as sns
+#Using Pearson Correlation
+plt.figure(figsize=(12,10))
+cor = X_train.corr()
+sns.heatmap(cor, annot=True, cmap=plt.cm.CMRmap_r)
+plt.show()
+
+In [95]:
+# with the following function we can select highly correlated features
+# it will remove the first feature that is correlated with anything other feature
+
+def correlation(dataset, threshold):
+    col_corr = set()  # Set of all the names of correlated columns
+    corr_matrix = dataset.corr()
+    for i in range(len(corr_matrix.columns)):
+        for j in range(i):
+            if abs(corr_matrix.iloc[i, j]) > threshold: # we are interested in absolute coeff value
+                colname = corr_matrix.columns[i]  # getting the name of column
+                col_corr.add(colname)
+    return col_corr
+In [96]:
+corr_features = correlation(X_train, 0.7)
+len(set(corr_features))
+Out[96]:
+4
+In [97]:
+corr_features
+Out[97]:
+{'AGE', 'DIS', 'NOX', 'TAX'}
+In [98]:
+X_train.drop(corr_features,axis=1)
+X_test.drop(corr_features,axis=1)
+Out[98]:
+CRIM	ZN	INDUS	CHAS	RM	RAD	PTRATIO	B	LSTAT
+329	0.06724	0.0	3.24	0.0	6.333	4.0	16.9	375.21	7.34
+371	9.23230	0.0	18.10	0.0	6.216	24.0	20.2	366.15	9.53
+219	0.11425	0.0	13.89	1.0	6.373	5.0	16.4	393.74	10.50
+403	24.80170	0.0	18.10	0.0	5.349	24.0	20.2	396.90	19.77
+78	0.05646	0.0	12.83	0.0	6.232	5.0	18.7	386.40	12.34
+...	...	...	...	...	...	...	...	...	...
+4	0.06905	0.0	2.18	0.0	7.147	3.0	18.7	396.90	5.33
+428	7.36711	0.0	18.10	0.0	6.193	24.0	20.2	96.73	21.52
+385	16.81180	0.0	18.10	0.0	5.277	24.0	20.2	396.90	30.81
+308	0.49298	0.0	9.90	0.0	6.635	4.0	18.4	396.90	4.54
+5	0.02985	0.0	2.18	0.0	6.430	3.0	18.7	394.12	5.21
+152 rows × 9 columns
+
+Let try with Big Dataset
+
+https://www.kaggle.com/c/santander-customer-satisfaction/data?select=train.csv
+
+In [99]:
+df=pd.read_csv('santander.csv',nrows=10000)
+X=df.drop(labels=['TARGET'], axis=1)
+y=df['TARGET']
+# separate dataset into train and test
+X_train, X_test, y_train, y_test = train_test_split(
+    df.drop(labels=['TARGET'], axis=1),
+    df['TARGET'],
+    test_size=0.3,
+    random_state=0)
+In [100]:
+import seaborn as sns
+#Using Pearson Correlation
+corrmat = X_train.corr()
+fig, ax = plt.subplots()
+fig.set_size_inches(11,11)
+sns.heatmap(corrmat)
+Out[100]:
+<AxesSubplot:>
+
+In [103]:
+corr_features = correlation(X_train, 0.9)
+len(set(corr_features))
+Out[103]:
+156
+In [104]:
+corr_features
+Out[104]:
+{'delta_imp_aport_var33_1y3',
+ 'delta_num_aport_var13_1y3',
+ 'delta_num_aport_var17_1y3',
+ 'delta_num_aport_var33_1y3',
+ 'delta_num_compra_var44_1y3',
+ 'delta_num_reemb_var13_1y3',
+ 'delta_num_trasp_var17_in_1y3',
+ 'delta_num_trasp_var33_in_1y3',
+ 'delta_num_venta_var44_1y3',
+ 'imp_aport_var17_ult1',
+ 'imp_aport_var33_hace3',
+ 'imp_op_var39_efect_ult1',
+ 'imp_op_var39_efect_ult3',
+ 'imp_op_var39_ult1',
+ 'imp_op_var40_efect_ult3',
+ 'imp_op_var40_ult1',
+ 'imp_reemb_var13_ult1',
+ 'imp_trasp_var17_in_ult1',
+ 'imp_trasp_var33_in_ult1',
+ 'imp_venta_var44_ult1',
+ 'ind_var10cte_ult1',
+ 'ind_var13',
+ 'ind_var13_corto',
+ 'ind_var13_largo',
+ 'ind_var20',
+ 'ind_var24',
+ 'ind_var25',
+ 'ind_var25_0',
+ 'ind_var26',
+ 'ind_var26_0',
+ 'ind_var26_cte',
+ 'ind_var29',
+ 'ind_var29_0',
+ 'ind_var31',
+ 'ind_var32',
+ 'ind_var32_0',
+ 'ind_var37',
+ 'ind_var37_0',
+ 'ind_var39',
+ 'ind_var40',
+ 'ind_var40_0',
+ 'ind_var41_0',
+ 'ind_var44',
+ 'ind_var6',
+ 'ind_var8',
+ 'ind_var9_cte_ult1',
+ 'ind_var9_ult1',
+ 'num_aport_var13_ult1',
+ 'num_aport_var17_ult1',
+ 'num_aport_var33_hace3',
+ 'num_aport_var33_ult1',
+ 'num_compra_var44_hace3',
+ 'num_med_var22_ult3',
+ 'num_meses_var12_ult3',
+ 'num_meses_var13_corto_ult3',
+ 'num_meses_var29_ult3',
+ 'num_meses_var33_ult3',
+ 'num_meses_var44_ult3',
+ 'num_meses_var5_ult3',
+ 'num_meses_var8_ult3',
+ 'num_op_var39_comer_ult1',
+ 'num_op_var39_comer_ult3',
+ 'num_op_var39_efect_ult1',
+ 'num_op_var39_efect_ult3',
+ 'num_op_var39_hace2',
+ 'num_op_var39_hace3',
+ 'num_op_var39_ult1',
+ 'num_op_var39_ult3',
+ 'num_op_var40_comer_ult3',
+ 'num_op_var40_efect_ult1',
+ 'num_op_var40_efect_ult3',
+ 'num_op_var40_ult3',
+ 'num_op_var41_comer_ult1',
+ 'num_op_var41_comer_ult3',
+ 'num_op_var41_efect_ult3',
+ 'num_op_var41_ult3',
+ 'num_reemb_var13_ult1',
+ 'num_sal_var16_ult1',
+ 'num_trasp_var17_in_ult1',
+ 'num_trasp_var33_in_ult1',
+ 'num_var1',
+ 'num_var12',
+ 'num_var12_0',
+ 'num_var13',
+ 'num_var13_0',
+ 'num_var13_corto',
+ 'num_var13_corto_0',
+ 'num_var13_largo',
+ 'num_var13_largo_0',
+ 'num_var14',
+ 'num_var14_0',
+ 'num_var17',
+ 'num_var1_0',
+ 'num_var20',
+ 'num_var20_0',
+ 'num_var24',
+ 'num_var24_0',
+ 'num_var25',
+ 'num_var25_0',
+ 'num_var26',
+ 'num_var26_0',
+ 'num_var29',
+ 'num_var29_0',
+ 'num_var31',
+ 'num_var32',
+ 'num_var32_0',
+ 'num_var33',
+ 'num_var33_0',
+ 'num_var35',
+ 'num_var37',
+ 'num_var37_0',
+ 'num_var39',
+ 'num_var39_0',
+ 'num_var40',
+ 'num_var40_0',
+ 'num_var41_0',
+ 'num_var44',
+ 'num_var44_0',
+ 'num_var45_hace2',
+ 'num_var45_ult3',
+ 'num_var5',
+ 'num_var5_0',
+ 'num_var6',
+ 'num_var6_0',
+ 'num_var7_recib_ult1',
+ 'num_var8',
+ 'num_var8_0',
+ 'num_venta_var44_ult1',
+ 'saldo_medio_var12_ult1',
+ 'saldo_medio_var12_ult3',
+ 'saldo_medio_var13_corto_hace2',
+ 'saldo_medio_var13_corto_ult1',
+ 'saldo_medio_var13_corto_ult3',
+ 'saldo_medio_var13_largo_ult1',
+ 'saldo_medio_var13_largo_ult3',
+ 'saldo_medio_var17_ult1',
+ 'saldo_medio_var17_ult3',
+ 'saldo_medio_var29_ult1',
+ 'saldo_medio_var29_ult3',
+ 'saldo_medio_var33_hace2',
+ 'saldo_medio_var33_hace3',
+ 'saldo_medio_var33_ult1',
+ 'saldo_medio_var33_ult3',
+ 'saldo_medio_var44_hace3',
+ 'saldo_medio_var44_ult1',
+ 'saldo_medio_var44_ult3',
+ 'saldo_var1',
+ 'saldo_var17',
+ 'saldo_var24',
+ 'saldo_var25',
+ 'saldo_var29',
+ 'saldo_var31',
+ 'saldo_var33',
+ 'saldo_var40',
+ 'saldo_var42',
+ 'saldo_var6'}
+In [105]:
+X_train.drop(corr_features,axis=1)
+Out[105]:
+ID	var3	var15	imp_ent_var16_ult1	imp_op_var39_comer_ult1	imp_op_var39_comer_ult3	imp_op_var40_comer_ult1	imp_op_var40_comer_ult3	imp_op_var40_efect_ult1	imp_op_var41_comer_ult1	...	saldo_medio_var13_medio_hace2	saldo_medio_var13_medio_hace3	saldo_medio_var13_medio_ult1	saldo_medio_var13_medio_ult3	saldo_medio_var17_hace2	saldo_medio_var17_hace3	saldo_medio_var29_hace2	saldo_medio_var29_hace3	saldo_medio_var44_hace2	var38
+7681	15431	2	42	840.0	4477.02	4989.54	0.0	0.0	0	4477.02	...	0	0	0	0	0.0	0.0	0.0	0	0.0	37491.21
+9031	18181	2	31	0.0	52.32	52.32	0.0	0.0	0	52.32	...	0	0	0	0	0.0	0.0	0.0	0	0.0	106685.94
+3691	7411	2	51	0.0	0.00	0.00	0.0	0.0	0	0.00	...	0	0	0	0	0.0	0.0	0.0	0	0.0	66144.66
+202	407	2	36	0.0	0.00	0.00	0.0	0.0	0	0.00	...	0	0	0	0	0.0	0.0	0.0	0	0.0	92121.36
+5625	11280	2	23	0.0	0.00	0.00	0.0	0.0	0	0.00	...	0	0	0	0	0.0	0.0	0.0	0	0.0	74650.83
+...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...	...
+9225	18564	2	33	0.0	0.00	0.00	0.0	0.0	0	0.00	...	0	0	0	0	0.0	0.0	0.0	0	0.0	117547.89
+4859	9723	2	24	0.0	0.00	0.00	0.0	0.0	0	0.00	...	0	0	0	0	0.0	0.0	0.0	0	0.0	71050.83
+3264	6557	2	24	0.0	0.00	0.00	0.0	0.0	0	0.00	...	0	0	0	0	0.0	0.0	0.0	0	0.0	141069.33
+9845	19796	2	38	0.0	0.00	0.00	0.0	0.0	0	0.00	...	0	0	0	0	0.0	0.0	0.0	0	0.0	86412.15
+2732	5441	2	23	0.0	0.00	0.00	0.0	0.0
