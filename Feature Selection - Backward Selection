@@ -1,0 +1,22 @@
+import pandas as pd 
+import statsmodels.formula.api as sms # import the necessary modules
+
+fires = pd.read_csv('forestfires.csv') # read in forestfires.csv
+
+# response variable
+Y = fires['area']  # set area as the response variable
+
+model1 = sms.ols('Y ~ FFMC + DMC + DC + ISI', data=fires).fit() # generate the multiple regression model for FFMC, DMC, DC, and ISI, in that order.
+# Prints the p-value
+print("model1 p-values are ", model1.pvalues)
+
+# second step of backward regression
+
+model2 = sms.ols('Y ~ FFMC + DMC + DC', data=fires).fit() # generate the MLR model using the order FFMC, DMC, DC, and ISI. Ex: if DMC is removed, use Y ~ FFMC + DC + ISI.
+print("model2 p-value is ", model2.pvalues)
+
+model3 = sms.ols('Y ~ DMC + DC', data=fires).fit()
+print("model3 p-value is ", model3.pvalues)
+# Continue until no variables have p-value greater than 0.15
+# print("model3 p-value is ", model3.pvalues)
+# print("model4 p-value is ", model4.pvalues)
