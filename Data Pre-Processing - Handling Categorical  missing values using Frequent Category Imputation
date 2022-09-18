@@ -1,0 +1,65 @@
+df=pd.read_csv('loan.csv', usecols=['BsmtQual','FireplaceQu','GarageType','SalePrice'])
+In [17]:
+df.shape
+Out[17]:
+(1460, 4)
+In [13]:
+df.isnull().sum()
+Out[13]:
+BsmtQual        37
+FireplaceQu    690
+GarageType      81
+SalePrice        0
+dtype: int64
+In [16]:
+df.isnull().mean().sort_values(ascending=True)
+Out[16]:
+SalePrice      0.000000
+BsmtQual       0.025342
+GarageType     0.055479
+FireplaceQu    0.472603
+dtype: float64
+Compute the frequency with every feature
+In [24]:
+df['BsmtQual'].value_counts().plot.bar()
+Out[24]:
+<matplotlib.axes._subplots.AxesSubplot at 0x1bfb73a1be0>
+
+In [21]:
+df.groupby(['BsmtQual'])['BsmtQual'].count().sort_values(ascending=False).plot.bar()
+Out[21]:
+<matplotlib.axes._subplots.AxesSubplot at 0x1bfb71f3320>
+
+In [25]:
+df['GarageType'].value_counts().plot.bar()
+Out[25]:
+<matplotlib.axes._subplots.AxesSubplot at 0x1bfb73d0908>
+
+In [26]:
+df['FireplaceQu'].value_counts().plot.bar()
+Out[26]:
+<matplotlib.axes._subplots.AxesSubplot at 0x1bfb74132e8>
+
+In [33]:
+df['GarageType'].value_counts().index[0]
+Out[33]:
+'Attchd'
+In [39]:
+df['GarageType'].mode()[0]
+Out[39]:
+'Attchd'
+In [34]:
+def impute_nan(df,variable):
+    most_frequent_category=df[variable].mode()[0]
+    df[variable].fillna(most_frequent_category,inplace=True)
+In [35]:
+for feature in ['BsmtQual','FireplaceQu','GarageType']:
+    impute_nan(df,feature)
+In [37]:
+df.isnull().mean()
+Out[37]:
+BsmtQual       0.0
+FireplaceQu    0.0
+GarageType     0.0
+SalePrice      0.0
+dtype: float64
