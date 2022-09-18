@@ -1,0 +1,37 @@
+df=pd.read_csv('titanic.csv', usecols=['Age','Fare','Survived'])
+df.head()
+Out[47]:
+Survived	Age	Fare
+0	0	22.0	7.2500
+1	1	38.0	71.2833
+2	1	26.0	7.9250
+3	1	35.0	53.1000
+4	0	35.0	8.0500
+In [48]:
+df.Age.hist(bins=50)
+Out[48]:
+<matplotlib.axes._subplots.AxesSubplot at 0x28618d75f28>
+
+In [53]:
+extreme=df.Age.mean()+3*df.Age.std()
+In [52]:
+import seaborn as sns
+sns.boxplot('Age',data=df)
+Out[52]:
+<matplotlib.axes._subplots.AxesSubplot at 0x2861de7a160>
+
+In [54]:
+def impute_nan(df,variable,median,extreme):
+    df[variable+"_end_distribution"]=df[variable].fillna(extreme)
+    df[variable].fillna(median,inplace=True)
+In [55]:
+impute_nan(df,'Age',df.Age.median(),extreme)
+In [56]:
+df.head()
+Out[56]:
+Survived	Age	Fare	Age_end_distribution
+0	0	22.0	7.2500	22.0
+1	1	38.0	71.2833	38.0
+2	1	26.0	7.9250	26.0
+3	1	35.0	53.1000	35.0
+4	0	35.0	8.0500	35.0
