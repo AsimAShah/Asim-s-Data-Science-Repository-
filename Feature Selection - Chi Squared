@@ -1,0 +1,138 @@
+import seaborn as sns
+df=sns.load_dataset('titanic')
+In [31]:
+df.head()
+Out[31]:
+survived	pclass	sex	age	sibsp	parch	fare	embarked	class	who	adult_male	deck	embark_town	alive	alone
+0	0	3	male	22.0	1	0	7.2500	S	Third	man	True	NaN	Southampton	no	False
+1	1	1	female	38.0	1	0	71.2833	C	First	woman	False	C	Cherbourg	yes	False
+2	1	3	female	26.0	0	0	7.9250	S	Third	woman	False	NaN	Southampton	yes	True
+3	1	1	female	35.0	1	0	53.1000	S	First	woman	False	C	Southampton	yes	False
+4	0	3	male	35.0	0	0	8.0500	S	Third	man	True	NaN	Southampton	no	True
+In [32]:
+df.info()
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 891 entries, 0 to 890
+Data columns (total 15 columns):
+ #   Column       Non-Null Count  Dtype   
+---  ------       --------------  -----   
+ 0   survived     891 non-null    int64   
+ 1   pclass       891 non-null    int64   
+ 2   sex          891 non-null    object  
+ 3   age          714 non-null    float64 
+ 4   sibsp        891 non-null    int64   
+ 5   parch        891 non-null    int64   
+ 6   fare         891 non-null    float64 
+ 7   embarked     889 non-null    object  
+ 8   class        891 non-null    category
+ 9   who          891 non-null    object  
+ 10  adult_male   891 non-null    bool    
+ 11  deck         203 non-null    category
+ 12  embark_town  889 non-null    object  
+ 13  alive        891 non-null    object  
+ 14  alone        891 non-null    bool    
+dtypes: bool(2), category(2), float64(2), int64(4), object(5)
+memory usage: 80.6+ KB
+In [33]:
+##['sex','embarked','alone','pclass','Survived']
+df=df[['sex','embarked','alone','pclass','survived']]
+df.head()
+Out[33]:
+sex	embarked	alone	pclass	survived
+0	male	S	False	3	0
+1	female	C	False	1	1
+2	female	S	True	3	1
+3	female	S	False	1	1
+4	male	S	True	3	0
+In [35]:
+df['sex']=np.where(df['sex']=="male",1,0)
+df.head()
+Out[35]:
+sex	embarked	alone	pclass	survived
+0	1	S	False	3	0
+1	0	C	False	1	1
+2	0	S	True	3	1
+3	0	S	False	1	1
+4	1	S	True	3	0
+In [36]:
+### Let's perform label encoding on sex column
+import numpy as np
+### let's perform label encoding on embarked
+ordinal_label = {k: i for i, k in enumerate(df['embarked'].unique(), 0)}
+df['embarked'] = df['embarked'].map(ordinal_label)
+In [37]:
+df.head()
+Out[37]:
+sex	embarked	alone	pclass	survived
+0	1	0	False	3	0
+1	0	1	False	1	1
+2	0	0	True	3	1
+3	0	0	False	1	1
+4	1	0	True	3	0
+In [38]:
+### let's perform label encoding on alone
+df['alone']=np.where(df['alone']==True,1,0)
+In [39]:
+df.head()
+Out[39]:
+sex	embarked	alone	pclass	survived
+0	1	0	0	3	0
+1	0	1	0	1	1
+2	0	0	1	3	1
+3	0	0	0	1	1
+4	1	0	1	3	0
+In [40]:
+### train Test split is usually done to avaoid overfitting
+from sklearn.model_selection import train_test_split
+X_train,X_test,y_train,y_test=train_test_split(df[['sex','embarked','alone','pclass']],
+                                              df['survived'],test_size=0.3,random_state=100)
+In [41]:
+X_train.head()
+Out[41]:
+sex	embarked	alone	pclass
+69	1	0	0	3
+85	0	0	0	3
+794	1	0	1	3
+161	0	0	1	2
+815	1	0	1	1
+In [42]:
+X_train['sex'].unique()
+Out[42]:
+array([1, 0])
+In [43]:
+X_train.isnull().sum()
+Out[43]:
+sex         0
+embarked    0
+alone       0
+pclass      0
+dtype: int64
+In [44]:
+## Perform chi2 test
+### chi2 returns 2 values
+### Fscore and the pvalue
+from sklearn.feature_selection import chi2
+f_p_values=chi2(X_train,y_train)
+In [45]:
+f_p_values
+Out[45]:
+(array([65.67929505,  7.55053653, 10.88471585, 21.97994154]),
+ array([5.30603805e-16, 5.99922095e-03, 9.69610546e-04, 2.75514881e-06]))
+In [48]:
+import pandas as pd
+p_values=pd.Series(f_p_values[1])
+p_values.index=X_train.columns
+p_values
+Out[48]:
+sex         5.306038e-16
+embarked    5.999221e-03
+alone       9.696105e-04
+pclass      2.755149e-06
+dtype: float64
+In [52]:
+p_values.sort_index(ascending=False)
+Out[52]:
+sex         5.306038e-16
+pclass      2.755149e-06
+embarked    5.999221e-03
+alone       9.696105e-04
